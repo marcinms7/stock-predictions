@@ -12,4 +12,4 @@ RUN pip install -r requirements.txt
 
 EXPOSE 8050
 
-CMD ["python3", "interactive_stocks_graphs2.py"]
+CMD ["python3", "interactive_stocks_graphs.py"]
