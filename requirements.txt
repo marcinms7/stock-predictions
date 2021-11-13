@@ -1,0 +1,13 @@
+dash
+dash-dangerously-set-inner-html
+plotly
+datetime
+pandas
+numpy
+matplotlib
+bs4
+selenium
+requests
+asyncio
+finnhub-python
+alpha_vantage

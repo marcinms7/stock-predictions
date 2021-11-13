@@ -12,8 +12,6 @@ NEWS_AMOUNT = 5
 df = finnhub_return_close_series(['MS','PPL'], '2019-09-01')
 news = finnhub_news_company(['MS','PPL'], '2019-09-01')
 
-import plotly.graph_objects as go
-
 from datetime import datetime
 
 import dash
@@ -102,7 +100,7 @@ def display_time_series(ticker):
 
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(debug=True, port=8050, host='0.0.0.0')
 
 
 
