@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 from bs4 import BeautifulSoup
 from selenium import webdriver
 import requests
+from datetime import datetime
 import time
 
 import asyncio
@@ -26,8 +27,13 @@ from alpha_vantage.timeseries import TimeSeries
 # remember to pip install finnhub-python
 import finnhub
 
+import plotly
+# %matplotlib auto
+
+
 ALPHA_API_KEY = "C0L2UP54CJFXNEOX"
 FINNHUB_CLIENT = finnhub.Client(api_key="c65f4faad3i9pn79pii0")
+TODAY = datetime.now().strftime("%Y-%m-%d")
 
 # SP_LIST_WEBSITE = "https://datahub.io/core/s-and-p-500-companies"
 SP_LIST_WEBSITE = "https://www.liberatedstocktrader.com/sp-500-companies-list-by-sector-market-cap/"
@@ -83,7 +89,7 @@ def alpha_vantage_yearly_time_series(alpha_vantage_api_key,
 
 def alpha_vantage_extract(tickers):
     for k,v in enumerate(tickers):
-        if k == 1:
+        if k == 0:
             dfmain = (alpha_vantage_yearly_time_series(ALPHA_API_KEY,tickers[k])
                       .rename(columns={'1. open': str(v) + '_Price'})[[str(v) + '_Price']])
         else:
@@ -96,15 +102,60 @@ def alpha_vantage_extract(tickers):
 
     
 def finnhub_news_company(tickers, fromdate = "2020-06-01",
-                         todate = "2021-10-10"):
+                         todate = TODAY):
     news = dict()
     for ticker in tickers:
-        news[str(ticker)] = (FINNHUB_CLIENT.company_news(ticker,
+        news[str(ticker) + '_Price'] = (FINNHUB_CLIENT.company_news(ticker,
                                                          _from=fromdate,
                                                          to=todate))
     return news
 
 
+def convert_to_unix_date(input_date):
+    return int(time.mktime(datetime.strptime
+                           (input_date, "%Y-%m-%d").timetuple()))
+
+
+def finnhub_stock_data(ticker, from_date,
+                      to_date = TODAY, freq = 'D'):
+    from_date = convert_to_unix_date(from_date)
+    to_date = convert_to_unix_date(to_date)
+    data = FINNHUB_CLIENT.stock_candles(ticker, freq,
+                                        from_date, to_date)
+    df = pd.DataFrame(data)
+    df.t = df.apply(lambda x: datetime.fromtimestamp(x.t), axis=1)
+    return df
+
+
+def finnhub_return_close_series(tickers, from_date,
+                          to_date = TODAY, freq='D'):
+    for k, v in enumerate(tickers):
+        if k == 0:
+            dfmain = (finnhub_stock_data(tickers[k],from_date,
+                                         to_date, freq)
+                      .rename(columns={'o': str(v) + '_Price',
+                                       't':'Date'})
+                      .set_index('Date'))
+            dfmain = dfmain[[str(v) + '_Price']]
+        else:
+            dftemp = (finnhub_stock_data(tickers[k],from_date,
+                                         to_date, freq)
+                      .rename(columns={'o': str(v) + '_Price',
+                                       't':'Date'})
+                      .set_index('Date'))
+            dftemp = dftemp[[str(v) + '_Price']]
+            dfmain = dfmain.join(dftemp)
+            del dftemp
+    return dfmain
+        
+
+def plotting_dataframe(dfplot):
+    for name in dfplot.columns:
+        f, (ax1) = plt.subplots(figsize=(14,5))
+        ax1.plot(dfplot.index, dfplot[name])
+        ax1.set_xlabel("Date", fontsize=12)
+        ax1.set_ylabel("Stock Price")
+        ax1.set_title(name + " Close Price History")
 
 
 
@@ -119,4 +170,14 @@ def finnhub_news_company(tickers, fromdate = "2020-06-01",
 
 
 
-                     
+
+
+
+
+
+
+
+
+
+
+
