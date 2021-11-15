@@ -32,7 +32,8 @@ import plotly
 
 
 ALPHA_API_KEY = "C0L2UP54CJFXNEOX"
-FINNHUB_CLIENT = finnhub.Client(api_key="c65f4faad3i9pn79pii0")
+FINNHUB_CLIENT = finnhub.Client(api_key="c693882ad3ibppargr0g")
+# FINNHUB_CLIENT.DEFAULT_TIMEOUT = 300
 TODAY = datetime.now().strftime("%Y-%m-%d")
 
 # SP_LIST_WEBSITE = "https://datahub.io/core/s-and-p-500-companies"

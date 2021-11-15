@@ -8,9 +8,11 @@ Created on Fri Nov 12 23:15:56 2021
 
 from stocks_api import finnhub_return_close_series, finnhub_news_company
 
-NEWS_AMOUNT = 5
-df = finnhub_return_close_series(['MS','PPL'], '2019-09-01')
-news = finnhub_news_company(['MS','PPL'], '2019-09-01')
+NEWS_AMOUNT = 7
+FROM_DATE = '2018-09-01'
+STOCKS_LIST = ['MS','PPL','MSFT', 'PYPL', 'MAXR']
+df = finnhub_return_close_series(STOCKS_LIST, FROM_DATE)
+news = finnhub_news_company(STOCKS_LIST, FROM_DATE)
 
 from datetime import datetime
 
@@ -86,13 +88,17 @@ def display_time_series(ticker):
     max_news = min(news_len, NEWS_AMOUNT)
     all_recent_news = ''
     for i in range(max_news):
-        headline = news[ticker][news_len - i -1]['headline']
-        text = news[ticker][news_len - i -1]['summary']
-        news_date = news[ticker][news_len - i -1]['datetime']
+        headline = news[ticker][i]['headline']
+        text = news[ticker][i]['summary']
+        news_date = news[ticker][i]['datetime']
+        url = news[ticker][i]['url']
         
         all_recent_news += '<b>Date:</b> ' + str(datetime.fromtimestamp(news_date)) + ' <br/> '
         all_recent_news += '<b>HEADLINE</b> :' + str(headline) + ' <br/> '
         all_recent_news += text + ' <br/><br/> '
+        # all_recent_news += '<b> URL </b>' + url + ' <br/><br/> '
+
+
         
     
     
